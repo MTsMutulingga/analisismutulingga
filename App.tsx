@@ -4,16 +4,20 @@ import InputSection from './components/InputSection.tsx';
 import OutputSection from './components/OutputSection.tsx';
 import MessageBox from './components/MessageBox.tsx';
 import Footer from './components/Footer.tsx';
+import LoadAnalysisModal from './components/LoadAnalysisModal.tsx';
 import { performAnalysisLogic } from './services/analysisService.ts';
-import type { AnalysisInput, Message, AnalysisResult } from './types.ts';
+import type { AnalysisInput, Message, AnalysisResult, SavedAnalysis } from './types.ts';
 import { DEFAULT_INPUTS } from './constants.ts';
 
-const LOCAL_STORAGE_KEY = 'mutulinggaAnalysisInputs';
+const IDENTITY_STORAGE_KEY = 'mutulinggaAnalysisInputs';
+const SESSIONS_STORAGE_KEY = 'mutulinggaSavedAnalyses';
 
 const App: React.FC = () => {
     const [inputs, setInputs] = useState<AnalysisInput>(DEFAULT_INPUTS);
     const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
     const [message, setMessage] = useState<Message | null>(null);
+    const [savedAnalyses, setSavedAnalyses] = useState<SavedAnalysis[]>([]);
+    const [isLoadModalOpen, setIsLoadModalOpen] = useState(false);
 
     const showMessage = useCallback((text: string, type: 'error' | 'info') => {
         setMessage({ text, type });
@@ -21,13 +25,17 @@ const App: React.FC = () => {
     }, []);
 
     useEffect(() => {
-        // Load saved identity from localStorage on initial load
+        // Load saved identity and saved sessions from localStorage on initial load
         try {
-            const savedData = localStorage.getItem(LOCAL_STORAGE_KEY);
-            if (savedData) {
-                const parsedData = JSON.parse(savedData);
-                // Merge saved data with defaults to ensure all keys are present
+            const savedIdentity = localStorage.getItem(IDENTITY_STORAGE_KEY);
+            if (savedIdentity) {
+                const parsedData = JSON.parse(savedIdentity);
                 setInputs(prev => ({ ...prev, ...parsedData }));
+            }
+            
+            const savedSessions = localStorage.getItem(SESSIONS_STORAGE_KEY);
+            if(savedSessions) {
+                setSavedAnalyses(JSON.parse(savedSessions));
             }
         } catch (error) {
             console.error("Failed to load data from localStorage", error);
@@ -50,12 +58,9 @@ const App: React.FC = () => {
             if (inputs.questions.length === 0) {
                  throw new Error("Tambahkan setidaknya satu butir soal untuk dianalisis.");
             }
-             // Validate KKTP
-            if (isNaN(inputs.kktp) || inputs.kktp < 0 || inputs.kktp > 100) {
+             if (isNaN(inputs.kktp) || inputs.kktp < 0 || inputs.kktp > 100) {
                  throw new Error("KKTP harus berupa angka antara 0 dan 100.");
             }
-
-            // Validate question scores
             if (inputs.questions.some(q => isNaN(q.score) || q.score <= 0)) {
                 throw new Error("Skor setiap soal harus berupa angka positif (lebih besar dari 0).");
             }
@@ -94,7 +99,7 @@ const App: React.FC = () => {
                 nipKepala: inputs.nipKepala,
                 capaianPembelajaran: inputs.capaianPembelajaran,
             };
-            localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(identityData));
+            localStorage.setItem(IDENTITY_STORAGE_KEY, JSON.stringify(identityData));
             showMessage("Identitas berhasil disimpan di browser ini.", "info");
         } catch (error) {
              console.error("Failed to save data to localStorage", error);
@@ -104,7 +109,7 @@ const App: React.FC = () => {
     
     const handleResetIdentity = useCallback(() => {
         if (window.confirm("Apakah Anda yakin ingin menghapus data identitas yang tersimpan?")) {
-            localStorage.removeItem(LOCAL_STORAGE_KEY);
+            localStorage.removeItem(IDENTITY_STORAGE_KEY);
             setInputs(prev => ({
                 ...prev,
                 guruMapel: DEFAULT_INPUTS.guruMapel,
@@ -122,6 +127,54 @@ const App: React.FC = () => {
         }
     }, [showMessage]);
 
+    const handleSaveAnalysis = useCallback(() => {
+        const name = window.prompt("Masukkan nama untuk analisis ini (cth: PH 1 Kelas 7A):");
+        if (name) {
+            try {
+                const newSave: SavedAnalysis = {
+                    id: Date.now(),
+                    name: name,
+                    savedAt: new Date().toISOString(),
+                    data: inputs
+                };
+                const updatedAnalyses = [...savedAnalyses, newSave];
+                setSavedAnalyses(updatedAnalyses);
+                localStorage.setItem(SESSIONS_STORAGE_KEY, JSON.stringify(updatedAnalyses));
+                showMessage(`Analisis "${name}" berhasil disimpan.`, "info");
+            } catch (error) {
+                console.error("Failed to save analysis", error);
+                showMessage("Gagal menyimpan analisis.", "error");
+            }
+        }
+    }, [inputs, savedAnalyses, showMessage]);
+
+    const handleLoadAnalysis = useCallback((id: number) => {
+        const analysisToLoad = savedAnalyses.find(a => a.id === id);
+        if (analysisToLoad) {
+            setInputs(analysisToLoad.data);
+            setAnalysisResult(null); // Clear previous results
+            setIsLoadModalOpen(false);
+            showMessage(`Analisis "${analysisToLoad.name}" berhasil dimuat.`, "info");
+        } else {
+            showMessage("Analisis yang dipilih tidak ditemukan.", "error");
+        }
+    }, [savedAnalyses, showMessage]);
+    
+    const handleDeleteAnalysis = useCallback((id: number) => {
+        const analysisToDelete = savedAnalyses.find(a => a.id === id);
+        if (analysisToDelete && window.confirm(`Apakah Anda yakin ingin menghapus analisis "${analysisToDelete.name}"?`)) {
+            try {
+                const updatedAnalyses = savedAnalyses.filter(a => a.id !== id);
+                setSavedAnalyses(updatedAnalyses);
+                localStorage.setItem(SESSIONS_STORAGE_KEY, JSON.stringify(updatedAnalyses));
+                showMessage("Analisis berhasil dihapus.", "info");
+            } catch (error) {
+                 console.error("Failed to delete analysis", error);
+                 showMessage("Gagal menghapus analisis.", "error");
+            }
+        }
+    }, [savedAnalyses, showMessage]);
+
     return (
         <div className="max-w-4xl mx-auto">
             <Header />
@@ -132,12 +185,21 @@ const App: React.FC = () => {
                     onAnalyze={handleAnalysis} 
                     onSaveIdentity={handleSaveIdentity}
                     onResetIdentity={handleResetIdentity}
+                    onSaveAnalysis={handleSaveAnalysis}
+                    onOpenLoadModal={() => setIsLoadModalOpen(true)}
                     showMessage={showMessage}
                 />
             </div>
             {analysisResult && <OutputSection result={analysisResult} inputs={inputs} />}
             <MessageBox message={message} />
             <Footer />
+            <LoadAnalysisModal
+                isOpen={isLoadModalOpen}
+                onClose={() => setIsLoadModalOpen(false)}
+                analyses={savedAnalyses}
+                onLoad={handleLoadAnalysis}
+                onDelete={handleDeleteAnalysis}
+            />
         </div>
     );
 };

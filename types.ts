@@ -70,3 +70,11 @@ export interface AnalysisResult {
     maxScore: number;
     totalQuestions: number;
 }
+
+// New type for saved analysis sessions
+export interface SavedAnalysis {
+    id: number;
+    name: string;
+    savedAt: string;
+    data: AnalysisInput;
+}

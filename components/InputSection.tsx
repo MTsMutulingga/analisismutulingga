@@ -9,15 +9,16 @@ interface InputSectionProps {
     onAnalyze: () => void;
     onSaveIdentity: () => void;
     onResetIdentity: () => void;
+    onSaveAnalysis: () => void;
+    onOpenLoadModal: () => void;
     showMessage: (text: string, type: Message['type']) => void;
 }
 
-const InputSection: React.FC<InputSectionProps> = ({ inputs, setInputs, onAnalyze, onSaveIdentity, onResetIdentity, showMessage }) => {
+const InputSection: React.FC<InputSectionProps> = ({ inputs, setInputs, onAnalyze, onSaveIdentity, onResetIdentity, onSaveAnalysis, onOpenLoadModal, showMessage }) => {
     const [studentDataText, setStudentDataText] = useState('');
     const [isAiScanModalOpen, setIsAiScanModalOpen] = useState(false);
     const [isKeyImportModalOpen, setIsKeyImportModalOpen] = useState(false);
     
-    // Sync textarea when table data changes
     useEffect(() => {
         const newText = inputs.studentData.map(s => 
             `${s.name}\t${s.answers.slice(0, inputs.questions.length).join('\t')}`
@@ -31,8 +32,6 @@ const InputSection: React.FC<InputSectionProps> = ({ inputs, setInputs, onAnalyz
         setInputs(prev => ({ ...prev, [name]: name === 'kktp' ? parseInt(value, 10) || 0 : value }));
     };
 
-    // FIX: Changed `value` type from `string | number` to `string` as all call sites pass a string.
-    // This resolves the type error when assigning `value` to `question.key` or `question.type`.
     const handleQuestionChange = (index: number, field: keyof Question, value: string) => {
         const newQuestions = [...inputs.questions];
         const question = { ...newQuestions[index] };
@@ -73,7 +72,6 @@ const InputSection: React.FC<InputSectionProps> = ({ inputs, setInputs, onAnalyz
             const parts = line.split('\t');
             const name = parts[0] || '';
             const answers = parts.slice(1, inputs.questions.length + 1);
-            // Pad answers if student has fewer answers than questions
             while (answers.length < inputs.questions.length) {
                 answers.push('');
             }
@@ -144,6 +142,7 @@ const InputSection: React.FC<InputSectionProps> = ({ inputs, setInputs, onAnalyz
     const primaryButton = `${baseButtonClass} bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-400`;
     const secondaryButton = `${baseButtonClass} bg-gray-200 text-gray-800 hover:bg-gray-300 focus:ring-gray-400`;
     const dangerButton = `${baseButtonClass} bg-red-600 text-white hover:bg-red-700 focus:ring-red-400`;
+    const successButton = `${baseButtonClass} bg-green-600 text-white hover:bg-green-700 focus:ring-green-400`;
 
     const labelClass = "block text-sm font-medium text-gray-700";
     const inputClass = "mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm";
@@ -152,6 +151,15 @@ const InputSection: React.FC<InputSectionProps> = ({ inputs, setInputs, onAnalyz
 
     return (
         <div className="space-y-8">
+
+            <div className="container-card bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+                <SubHeader title="Manajemen Sesi" subtitle="Simpan seluruh data (identitas, soal, jawaban) untuk dimuat kembali nanti." />
+                <div className="flex flex-wrap gap-3">
+                    <button onClick={onSaveAnalysis} className={successButton}>Simpan Analisis Saat Ini</button>
+                    <button onClick={onOpenLoadModal} className={primaryButton}>Muat Analisis Tersimpan</button>
+                </div>
+            </div>
+
             <div className="container-card bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
                 <SubHeader title="1. Identitas Laporan" subtitle="Informasi umum mengenai penilaian yang akan dianalisis." />
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
@@ -201,7 +209,7 @@ const InputSection: React.FC<InputSectionProps> = ({ inputs, setInputs, onAnalyz
                     </div>
                 </div>
                 <div className="flex flex-wrap gap-2 mt-6">
-                    <button onClick={onSaveIdentity} className={secondaryButton}>Simpan Identitas</button>
+                    <button onClick={onSaveIdentity} className={secondaryButton}>Simpan Identitas Saja</button>
                     <button onClick={onResetIdentity} className={dangerButton}>Hapus Identitas Tersimpan</button>
                 </div>
             </div>
