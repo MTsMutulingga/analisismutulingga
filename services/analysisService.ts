@@ -1,5 +1,5 @@
 import React from 'react';
-import type { AnalysisInput, AnalysisResult, Student, ItemAnalysis } from '../types.ts';
+import type { AnalysisInput, AnalysisResult, Student, ItemAnalysis, DistractorAnalysis } from '../types.ts';
 
 const getDifficultyCriteria = (P: number): { criteria: React.ReactNode, plain: string } => {
     if (P > 0.7) return { criteria: React.createElement('span', { className: 'text-green-600 font-semibold' }, 'Mudah'), plain: 'Mudah' };
@@ -115,7 +115,8 @@ export const performAnalysisLogic = (inputs: AnalysisInput): AnalysisResult => {
     const upperGroup = studentsWithScores.filter(s => s.group === 'Atas');
     const lowerGroup = studentsWithScores.filter(s => s.group === 'Bawah');
     
-    const itemAnalysis: ItemAnalysis[] = questions.map((question, i) => {
+    // FIX: Explicitly type the return value of the map callback to help TypeScript's inference.
+    const itemAnalysis: ItemAnalysis[] = questions.map((question, i): ItemAnalysis | null => {
         if (!question.key.trim()) return null;
 
         const questionKey = question.key.trim().toUpperCase();
@@ -149,6 +150,24 @@ export const performAnalysisLogic = (inputs: AnalysisInput): AnalysisResult => {
         const { criteria: P_criteria, plain: P_criteria_plain } = getDifficultyCriteria(P_val);
         const { criteria: D_criteria, plain: D_criteria_plain } = getDiscriminationCriteria(D_val);
 
+        let distractorAnalysis: DistractorAnalysis | undefined = undefined;
+        if (question.type === 'Pilihan Ganda' && numStudents > 0) {
+            distractorAnalysis = {};
+            const options = ['A', 'B', 'C', 'D', 'E']; // Standard options
+            options.forEach(option => {
+                const getCount = (group: Student[]) => group.filter(s => s.answers[i]?.trim().toUpperCase() === option).length;
+                
+                const upperGroupCount = getCount(upperGroup);
+                const lowerGroupCount = getCount(lowerGroup);
+                const totalCount = getCount(studentsWithScores);
+
+                // Only include options that were chosen by at least one student or is the key
+                if (totalCount > 0 || option === questionKey) {
+                   distractorAnalysis![option] = { upperGroupCount, lowerGroupCount, totalCount };
+                }
+            });
+        }
+
         return {
             questionId: i + 1,
             key: question.key,
@@ -162,6 +181,7 @@ export const performAnalysisLogic = (inputs: AnalysisInput): AnalysisResult => {
             D: D_val.toFixed(2),
             D_criteria,
             D_criteria_plain,
+            distractorAnalysis,
         };
     }).filter((item): item is ItemAnalysis => item !== null);
 

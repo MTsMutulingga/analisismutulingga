@@ -49,6 +49,16 @@ export interface Student {
     status: 'Tuntas' | 'Belum Tuntas';
 }
 
+export interface DistractorDetail {
+    upperGroupCount: number;
+    lowerGroupCount: number;
+    totalCount: number;
+}
+
+export interface DistractorAnalysis {
+    [option: string]: DistractorDetail;
+}
+
 export interface ItemAnalysis {
     questionId: number;
     key: string;
@@ -62,6 +72,7 @@ export interface ItemAnalysis {
     D: string; // Discrimination index
     D_criteria: React.ReactNode;
     D_criteria_plain: string;
+    distractorAnalysis?: DistractorAnalysis; // Optional: only for multiple choice
 }
 
 export interface AnalysisResult {

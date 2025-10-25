@@ -96,16 +96,19 @@ const UserGuideModal: React.FC<UserGuideModalProps> = ({ isOpen, onClose }) => {
 
                     <div className="pt-4 border-t">
                         <h4 className="text-lg font-bold text-gray-800 mb-2">Lampiran: Detail Perhitungan Analisis</h4>
-                        <div className="space-y-3 text-sm">
+                        <div className="space-y-4 text-sm">
+                             <p className="bg-blue-50 p-3 rounded-lg border border-blue-200">
+                                <strong>Sumber dan Landasan Teori:</strong> Rumus-rumus yang digunakan dalam aplikasi ini adalah metode standar yang mapan dalam bidang evaluasi pendidikan dan psikometri, yang berakar pada <strong>Teori Tes Klasik (Classical Test Theory - CTT)</strong>. Metodologi ini umum digunakan oleh guru dan lembaga pendidikan untuk analisis butir soal.
+                            </p>
                             <p>
-                                <strong>1. Pengelompokan Siswa (Atas & Bawah):</strong>
+                                <strong>1. Pengelompokan Siswa (27% Atas & Bawah):</strong>
                                 <br />
-                                Siswa diurutkan berdasarkan skor tertinggi ke terendah. Sebanyak 27% siswa dengan skor teratas masuk "Kelompok Atas", dan 27% siswa dengan skor terbawah masuk "Kelompok Bawah". Kelompok ini digunakan untuk menghitung Daya Pembeda.
+                                Metode ini dipopulerkan oleh Truman Lee Kelley (1939) yang menemukan bahwa 27% adalah angka optimal untuk memaksimalkan perbedaan antar kelompok sambil menjaga ukuran sampel tetap stabil secara statistik. Kelompok ini digunakan untuk menghitung Daya Pembeda.
                             </p>
                             <p>
                                 <strong>2. Tingkat Kesulitan (P - Proporsi):</strong>
                                 <br />
-                                Ini mengukur seberapa mudah atau sulit sebuah soal. Rumusnya: `P = Jumlah Jawaban Benar (R) / Jumlah Seluruh Siswa (N)`.
+                                Ini adalah formula paling dasar dalam CTT untuk mengukur proporsi siswa yang menjawab soal dengan benar. Rumusnya: `P = Jumlah Jawaban Benar (R) / Jumlah Seluruh Siswa (N)`.
                                 <br />- **Sukar:** P &lt; 0.30
                                 <br />- **Sedang:** 0.30 ≤ P ≤ 0.70
                                 <br />- **Mudah:** P &gt; 0.70
@@ -113,11 +116,16 @@ const UserGuideModal: React.FC<UserGuideModalProps> = ({ isOpen, onClose }) => {
                             <p>
                                 <strong>3. Daya Pembeda (D - Diskriminasi):</strong>
                                 <br />
-                                Ini mengukur kemampuan soal untuk membedakan antara siswa "pintar" (Kelompok Atas) dan siswa "kurang pintar" (Kelompok Bawah). Rumusnya: `D = (Benar di Kelompok Atas (RU) - Benar di Kelompok Bawah (RL)) / Jumlah Siswa di Satu Kelompok (n)`.
+                                Ini mengukur kemampuan soal untuk membedakan antara siswa "pintar" (Kelompok Atas) dan siswa "kurang pintar" (Kelompok Bawah). Soal yang baik akan lebih banyak dijawab benar oleh Kelompok Atas. Rumusnya: `D = (Benar di Kelompok Atas (RU) - Benar di Kelompok Bawah (RL)) / Jumlah Siswa di Satu Kelompok (n)`.
                                 <br />- **Sangat Baik:** D &gt; 0.40
                                 <br />- **Baik:** 0.30 ≤ D &lt; 0.40
                                 <br />- **Cukup:** 0.20 ≤ D &lt; 0.30
                                 <br />- **Buruk:** D &lt; 0.20 (Soal ini perlu direvisi atau diganti)
+                            </p>
+                            <p>
+                                <strong>4. Analisis Efektivitas Pengecoh (Distraktor):</strong>
+                                <br />
+                                Fitur ini (khusus soal Pilihan Ganda) menganalisis seberapa baik pilihan jawaban yang salah (pengecoh) berfungsi. Pengecoh yang **baik (✔️)** adalah yang dipilih oleh lebih banyak siswa dari Kelompok Bawah daripada Kelompok Atas. Ini menunjukkan bahwa pengecoh tersebut masuk akal namun salah, sehingga efektif menjebak siswa yang belum sepenuhnya paham materi. Pengecoh yang **buruk (❌)** adalah kebalikannya dan perlu ditinjau.
                             </p>
                         </div>
                     </div>

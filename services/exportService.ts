@@ -1,4 +1,4 @@
-import type { AnalysisResult, AnalysisInput } from '../types.ts';
+import type { AnalysisResult, AnalysisInput, DistractorAnalysis } from '../types.ts';
 
 const formatDate = (dateString: string): string => {
     if (!dateString) return '....................................';
@@ -12,6 +12,34 @@ const formatDate = (dateString: string): string => {
         return '....................................';
     }
 };
+
+const renderDistractorHtml = (distractors: DistractorAnalysis | undefined, key: string): string => {
+    if (!distractors) return '<td>-</td>';
+
+    let html = '<td style="font-size: 8pt; text-align: left; vertical-align: top;"><ul>';
+    const options = Object.keys(distractors).sort();
+
+    for (const option of options) {
+        const detail = distractors[option];
+        let style = '';
+        let marker = '';
+
+        if (option === key) {
+            style = 'font-weight: bold; color: #166534;'; // Green-800
+            marker = ' (Kunci)';
+        } else {
+            if (detail.lowerGroupCount > detail.upperGroupCount) {
+                style = 'color: #15803d;'; // Green-700 - Good distractor
+            } else {
+                style = 'color: #b91c1c;'; // Red-700 - Bad distractor
+            }
+        }
+        html += `<li style="margin: 0; padding: 1px 0; ${style}">${option}: ${detail.totalCount} (A: ${detail.upperGroupCount}, B: ${detail.lowerGroupCount})${marker}</li>`;
+    }
+    html += '</ul></td>';
+    return html;
+};
+
 
 export const generateReportHtml = (result: AnalysisResult, inputs: AnalysisInput): string => {
     const { students, itemAnalysis, totalQuestions } = result;
@@ -74,6 +102,7 @@ export const generateReportHtml = (result: AnalysisResult, inputs: AnalysisInput
                     <th>Kriteria P</th>
                     <th>Daya Pembeda (D)</th>
                     <th>Kriteria D</th>
+                    <th>Analisis Pengecoh</th>
                 </tr>
             </thead>
             <tbody>
@@ -89,6 +118,7 @@ export const generateReportHtml = (result: AnalysisResult, inputs: AnalysisInput
                         <td class="text-center">${item.P_criteria_plain}</td>
                         <td class="text-center">${item.D}</td>
                         <td class="text-center">${item.D_criteria_plain}</td>
+                        ${renderDistractorHtml(item.distractorAnalysis, item.key)}
                     </tr>`;
                 }).join('')}
             </tbody>
@@ -208,6 +238,11 @@ export const generateReportHtml = (result: AnalysisResult, inputs: AnalysisInput
                     font-weight: bold;
                     text-align: center; 
                 }
+                td ul {
+                    list-style-type: none;
+                    padding: 0;
+                    margin: 0;
+                }
                 .chart-container { 
                     text-align: center; 
                     margin: 2rem 0; 
@@ -268,7 +303,7 @@ export const generateReportHtml = (result: AnalysisResult, inputs: AnalysisInput
             <p style="font-size: 8pt;">Kelompok: KA (Pengayaan), KT (Reguler), KB (Remidi).</p>
             <h2>Analisis Butir Soal</h2>
             ${itemAnalysisTableHtml}
-            <p style="font-size: 8pt;">* Respon (B/S/K): Jumlah jawaban Benar / Salah / Kosong.<br>P: Mudah (>0.70), Sedang (0.30-0.70), Sukar (<0.30).<br>D: Sangat Baik (>0.40), Baik (0.30-0.39), Cukup (0.20-0.29), Buruk (<0.20).</p>
+            <p style="font-size: 8pt;">* Respon (B/S/K): Jumlah jawaban Benar / Salah / Kosong.<br>P: Mudah (>0.70), Sedang (0.30-0.70), Sukar (<0.30).<br>D: Sangat Baik (>0.40), Baik (0.30-0.39), Cukup (0.20-0.29), Buruk (<0.20).<br>Pengecoh: A (Atas), B (Bawah). Pengecoh baik jika pemilih B > A.</p>
             <div class="signature-box">
                 <div class="signature-item">
                     <span>Purbalingga, ${formattedAnalysisDate}</span>
@@ -321,10 +356,22 @@ export const exportToCSV = (result: AnalysisResult, inputs: AnalysisInput) => {
     
     csvContent += "ANALISIS BUTIR SOAL\n";
     csvContent += `Total Siswa:,${students.length}\n`;
-    csvContent += "Soal,Jenis,Kunci,Jml Benar,Jml Salah,Jml Kosong,Tingkat Kesulitan (P),Kriteria P,Daya Pembeda (D),Kriteria D\n";
+    const distractorHeaders = "Pilihan A (Total),Pilihan A (Atas),Pilihan A (Bawah),Pilihan B (Total),Pilihan B (Atas),Pilihan B (Bawah),Pilihan C (Total),Pilihan C (Atas),Pilihan C (Bawah),Pilihan D (Total),Pilihan D (Atas),Pilihan D (Bawah),Pilihan E (Total),Pilihan E (Atas),Pilihan E (Bawah)\n";
+    csvContent += "Soal,Jenis,Kunci,Jml Benar,Jml Salah,Jml Kosong,Tingkat Kesulitan (P),Kriteria P,Daya Pembeda (D),Kriteria D," + distractorHeaders;
     result.itemAnalysis.forEach(item => {
         const wrongCount = item.numStudents - item.R - item.unansweredCount;
-        csvContent += `${item.questionId},${item.type},${item.key},${item.R},${wrongCount},${item.unansweredCount},${item.P},${item.P_criteria_plain},${item.D},${item.D_criteria_plain}\n`;
+        let distractorRow = '';
+        if (item.type === 'Pilihan Ganda' && item.distractorAnalysis) {
+            const options = ['A', 'B', 'C', 'D', 'E'];
+            options.forEach(opt => {
+                const data = item.distractorAnalysis?.[opt];
+                distractorRow += `${data?.totalCount ?? 0},${data?.upperGroupCount ?? 0},${data?.lowerGroupCount ?? 0},`;
+            });
+        } else {
+             distractorRow = ',,,,,,,,,,,,,,,'; // 15 commas for empty distractor columns
+        }
+
+        csvContent += `${item.questionId},${item.type},${item.key},${item.R},${wrongCount},${item.unansweredCount},${item.P},${item.P_criteria_plain},${item.D},${item.D_criteria_plain},${distractorRow}\n`;
     });
 
     const encodedUri = encodeURI(csvContent);

@@ -1,5 +1,3 @@
-
-
 import React from 'react';
 import type { AnalysisResult, AnalysisInput } from '../types.ts';
 import ScoreDistributionChart from './ScoreDistributionChart.tsx';
@@ -45,7 +43,8 @@ const OutputSection: React.FC<OutputSectionProps> = ({ result, inputs }) => {
                  <p className="text-xs text-gray-500 mt-4">
                     * Respon (B/S/K): Jumlah jawaban Benar / Salah / Kosong (Tidak Menjawab).<br />
                     Kriteria P (Tingkat Kesulitan): Mudah (&gt; 0.70), Sedang (0.30 - 0.70), Sukar (&lt; 0.30).<br />
-                    Kriteria D (Daya Pembeda): Sangat Baik (&gt; 0.40), Baik (0.30 - 0.39), Cukup (0.20 - 0.29), Buruk (&lt; 0.20).
+                    Kriteria D (Daya Pembeda): Sangat Baik (&gt; 0.40), Baik (0.30 - 0.39), Cukup (0.20 - 0.29), Buruk (&lt; 0.20).<br />
+                    Analisis Pengecoh: Menunjukkan jumlah pemilih per opsi. (A: Kelompok Atas, B: Kelompok Bawah). Pengecoh yang baik (✔️) dipilih lebih banyak oleh kelompok Bawah.
                 </p>
             </div>
         </div>
