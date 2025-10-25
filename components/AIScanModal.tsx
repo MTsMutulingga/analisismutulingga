@@ -67,12 +67,6 @@ const AIScanModal: React.FC<AIScanModalProps> = ({ isOpen, onClose, onScanComple
         setIsLoading(true);
         setError(null);
         setScannedData(null);
-
-        if (!process.env.API_KEY) {
-            setError("API Key for Gemini not configured.");
-            setIsLoading(false);
-            return;
-        }
         
         try {
             const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
@@ -132,7 +126,7 @@ const AIScanModal: React.FC<AIScanModalProps> = ({ isOpen, onClose, onScanComple
         } catch (err) {
             console.error("AI processing error:", err);
             setError("Gagal menganalisis gambar. Coba lagi dengan gambar yang lebih jelas.");
-            showMessage("Analisis AI gagal. Pastikan API Key valid dan gambar tidak buram.", "error");
+            showMessage("Analisis AI gagal. Pastikan gambar tidak buram dan coba lagi.", "error");
         } finally {
             setIsLoading(false);
         }

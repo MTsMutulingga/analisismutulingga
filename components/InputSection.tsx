@@ -271,14 +271,9 @@ const InputSection: React.FC<InputSectionProps> = ({ inputs, setInputs, onAnalyz
                     onChange={handleStudentDataChange}
                 />
                  <div className="flex flex-wrap gap-2 mt-4 items-center">
-                    <button onClick={() => setIsAiScanModalOpen(true)} className={`${primaryButton} disabled:bg-gray-400 disabled:cursor-not-allowed`} disabled={!process.env.API_KEY}>
+                    <button onClick={() => setIsAiScanModalOpen(true)} className={primaryButton}>
                        Pindai LJK dengan AI
                     </button>
-                     {!process.env.API_KEY && (
-                         <p className="text-xs text-red-600 self-center">
-                           Fitur AI dinonaktifkan. Atur <code className="bg-gray-200 p-1 rounded">API_KEY</code> untuk mengaktifkan.
-                        </p>
-                    )}
                 </div>
                 
                 <div className="mt-6 pt-4 border-t">
