@@ -11,12 +11,13 @@ interface InputSectionProps {
     onResetIdentity: () => void;
     onSaveAnalysis: () => void;
     onOpenLoadModal: () => void;
+    onOpenGuideModal: () => void;
     onExportAnalysis: () => void;
     onImportAnalysis: (event: React.ChangeEvent<HTMLInputElement>) => void;
     showMessage: (text: string, type: Message['type']) => void;
 }
 
-const InputSection: React.FC<InputSectionProps> = ({ inputs, setInputs, onAnalyze, onSaveIdentity, onResetIdentity, onSaveAnalysis, onOpenLoadModal, onExportAnalysis, onImportAnalysis, showMessage }) => {
+const InputSection: React.FC<InputSectionProps> = ({ inputs, setInputs, onAnalyze, onSaveIdentity, onResetIdentity, onSaveAnalysis, onOpenLoadModal, onOpenGuideModal, onExportAnalysis, onImportAnalysis, showMessage }) => {
     const [studentDataText, setStudentDataText] = useState('');
     const [isAiScanModalOpen, setIsAiScanModalOpen] = useState(false);
     const [isKeyImportModalOpen, setIsKeyImportModalOpen] = useState(false);
@@ -145,6 +146,7 @@ const InputSection: React.FC<InputSectionProps> = ({ inputs, setInputs, onAnalyz
     const secondaryButton = `${baseButtonClass} bg-gray-200 text-gray-800 hover:bg-gray-300 focus:ring-gray-400`;
     const dangerButton = `${baseButtonClass} bg-red-600 text-white hover:bg-red-700 focus:ring-red-400`;
     const successButton = `${baseButtonClass} bg-green-600 text-white hover:bg-green-700 focus:ring-green-400`;
+    const infoButton = `${baseButtonClass} bg-teal-600 text-white hover:bg-teal-700 focus:ring-teal-400`;
 
     const labelClass = "block text-sm font-medium text-gray-700";
     const inputClass = "mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm";
@@ -155,7 +157,7 @@ const InputSection: React.FC<InputSectionProps> = ({ inputs, setInputs, onAnalyz
         <div className="space-y-8">
 
             <div className="container-card bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-                <SubHeader title="Manajemen Sesi" subtitle="Simpan & muat seluruh data analisis (identitas, soal, jawaban)." />
+                <SubHeader title="Manajemen Sesi & Bantuan" subtitle="Simpan, muat, ekspor, impor, dan lihat petunjuk kerja." />
                 <div className="flex flex-wrap gap-3">
                     <button onClick={onSaveAnalysis} className={successButton}>Simpan di Browser</button>
                     <button onClick={onOpenLoadModal} className={primaryButton}>Muat dari Browser</button>
@@ -164,6 +166,7 @@ const InputSection: React.FC<InputSectionProps> = ({ inputs, setInputs, onAnalyz
                         Impor dari File
                         <input type="file" accept=".json,application/json" onChange={onImportAnalysis} className="hidden" />
                     </label>
+                    <button onClick={onOpenGuideModal} className={infoButton}>Petunjuk Kerja</button>
                 </div>
             </div>
 
@@ -297,9 +300,9 @@ const InputSection: React.FC<InputSectionProps> = ({ inputs, setInputs, onAnalyz
                                     <th className="px-3 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
                                 </tr>
                             </thead>
-                            <tbody className="bg-white divide-y divide-gray-200">
+                            <tbody className="bg-white">
                                 {inputs.studentData.map((student, studentIndex) => (
-                                    <tr key={studentIndex}>
+                                    <tr key={studentIndex} className="even:bg-gray-50">
                                         <td className="px-3 py-1 text-center text-sm text-gray-500">{studentIndex + 1}</td>
                                         <td className="px-3 py-1">
                                             <input
@@ -316,7 +319,7 @@ const InputSection: React.FC<InputSectionProps> = ({ inputs, setInputs, onAnalyz
                                                     type="text"
                                                     value={student.answers[answerIndex] || ''}
                                                     onChange={(e) => handleStudentAnswerChange(studentIndex, answerIndex, e.target.value.toUpperCase())}
-                                                    className="w-12 border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-1 text-center"
+                                                    className="w-16 bg-gray-100 border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-1 text-center focus:bg-white transition-colors"
                                                 />
                                             </td>
                                         ))}

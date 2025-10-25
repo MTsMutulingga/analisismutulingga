@@ -5,6 +5,8 @@ import OutputSection from './components/OutputSection.tsx';
 import MessageBox from './components/MessageBox.tsx';
 import Footer from './components/Footer.tsx';
 import LoadAnalysisModal from './components/LoadAnalysisModal.tsx';
+import UserGuideModal from './components/UserGuideModal.tsx';
+import DeveloperInfoModal from './components/DeveloperInfoModal.tsx';
 import { performAnalysisLogic } from './services/analysisService.ts';
 import type { AnalysisInput, Message, AnalysisResult, SavedAnalysis } from './types.ts';
 import { DEFAULT_INPUTS } from './constants.ts';
@@ -18,6 +20,8 @@ const App: React.FC = () => {
     const [message, setMessage] = useState<Message | null>(null);
     const [savedAnalyses, setSavedAnalyses] = useState<SavedAnalysis[]>([]);
     const [isLoadModalOpen, setIsLoadModalOpen] = useState(false);
+    const [isGuideModalOpen, setIsGuideModalOpen] = useState(false);
+    const [isDeveloperInfoModalOpen, setIsDeveloperInfoModalOpen] = useState(false);
 
     const showMessage = useCallback((text: string, type: 'error' | 'info') => {
         setMessage({ text, type });
@@ -248,6 +252,7 @@ const App: React.FC = () => {
                     onResetIdentity={handleResetIdentity}
                     onSaveAnalysis={handleSaveAnalysis}
                     onOpenLoadModal={() => setIsLoadModalOpen(true)}
+                    onOpenGuideModal={() => setIsGuideModalOpen(true)}
                     onExportAnalysis={handleExportAnalysis}
                     onImportAnalysis={handleImportAnalysis}
                     showMessage={showMessage}
@@ -255,13 +260,21 @@ const App: React.FC = () => {
             </div>
             {analysisResult && <OutputSection result={analysisResult} inputs={inputs} />}
             <MessageBox message={message} />
-            <Footer />
+            <Footer onOpenDeveloperInfo={() => setIsDeveloperInfoModalOpen(true)} />
             <LoadAnalysisModal
                 isOpen={isLoadModalOpen}
                 onClose={() => setIsLoadModalOpen(false)}
                 analyses={savedAnalyses}
                 onLoad={handleLoadAnalysis}
                 onDelete={handleDeleteAnalysis}
+            />
+            <UserGuideModal
+                isOpen={isGuideModalOpen}
+                onClose={() => setIsGuideModalOpen(false)}
+            />
+            <DeveloperInfoModal
+                isOpen={isDeveloperInfoModalOpen}
+                onClose={() => setIsDeveloperInfoModalOpen(false)}
             />
         </div>
     );
