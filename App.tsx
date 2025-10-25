@@ -175,6 +175,67 @@ const App: React.FC = () => {
         }
     }, [savedAnalyses, showMessage]);
 
+    const handleExportAnalysis = useCallback(() => {
+        try {
+            const fileName = `analisis_nilai_${inputs.mataPelajaran.replace(/\s/g, '_') || 'export'}_${new Date().toISOString().split('T')[0]}.json`;
+            const jsonString = JSON.stringify(inputs, null, 2); // pretty print JSON
+            const blob = new Blob([jsonString], { type: 'application/json' });
+            const href = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = href;
+            link.download = fileName;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(href);
+            showMessage("Analisis berhasil diekspor ke file.", "info");
+        } catch (error) {
+            console.error("Failed to export analysis", error);
+            showMessage("Gagal mengekspor analisis.", "error");
+        }
+    }, [inputs, showMessage]);
+
+    const handleImportAnalysis = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const text = e.target?.result;
+                if (typeof text !== 'string') {
+                    throw new Error("Konten file tidak dapat dibaca.");
+                }
+                const data = JSON.parse(text);
+
+                // Basic validation
+                if (typeof data === 'object' && data !== null && 'questions' in data && 'studentData' in data) {
+                    setInputs(data as AnalysisInput);
+                    setAnalysisResult(null); // Clear previous results
+                    showMessage(`Analisis dari file "${file.name}" berhasil dimuat.`, "info");
+                } else {
+                    throw new Error("File tidak valid atau format tidak sesuai.");
+                }
+            } catch (error) {
+                console.error("Failed to import analysis", error);
+                if (error instanceof Error) {
+                    showMessage(`Gagal mengimpor file: ${error.message}`, "error");
+                } else {
+                    showMessage("Gagal mengimpor file.", "error");
+                }
+            } finally {
+                // Reset file input value to allow re-uploading the same file
+                if(event.target) {
+                    event.target.value = '';
+                }
+            }
+        };
+        reader.onerror = () => {
+            showMessage("Gagal membaca file.", "error");
+        };
+        reader.readAsText(file);
+    }, [showMessage]);
+
     return (
         <div className="max-w-4xl mx-auto">
             <Header />
@@ -187,6 +248,8 @@ const App: React.FC = () => {
                     onResetIdentity={handleResetIdentity}
                     onSaveAnalysis={handleSaveAnalysis}
                     onOpenLoadModal={() => setIsLoadModalOpen(true)}
+                    onExportAnalysis={handleExportAnalysis}
+                    onImportAnalysis={handleImportAnalysis}
                     showMessage={showMessage}
                 />
             </div>

@@ -1,5 +1,5 @@
 {
-  "name": "Copy of Analisis Nilai MTs Mutulingga",
+  "name": "Analisis Nilai MTs Mutulingga Jadi Di vercel",
   "description": "Aplikasi untuk menganalisis hasil penilaian siswa. Aplikasi ini menghitung skor, melakukan analisis butir soal untuk menentukan tingkat kesulitan dan daya pembeda, serta menyarankan tindak lanjut bagi siswa. Aplikasi ini juga memvisualisasikan distribusi skor dan memungkinkan ekspor hasil ke CSV, HTML, atau PDF.",
   "requestFramePermissions": [
     "camera"

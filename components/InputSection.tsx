@@ -11,10 +11,12 @@ interface InputSectionProps {
     onResetIdentity: () => void;
     onSaveAnalysis: () => void;
     onOpenLoadModal: () => void;
+    onExportAnalysis: () => void;
+    onImportAnalysis: (event: React.ChangeEvent<HTMLInputElement>) => void;
     showMessage: (text: string, type: Message['type']) => void;
 }
 
-const InputSection: React.FC<InputSectionProps> = ({ inputs, setInputs, onAnalyze, onSaveIdentity, onResetIdentity, onSaveAnalysis, onOpenLoadModal, showMessage }) => {
+const InputSection: React.FC<InputSectionProps> = ({ inputs, setInputs, onAnalyze, onSaveIdentity, onResetIdentity, onSaveAnalysis, onOpenLoadModal, onExportAnalysis, onImportAnalysis, showMessage }) => {
     const [studentDataText, setStudentDataText] = useState('');
     const [isAiScanModalOpen, setIsAiScanModalOpen] = useState(false);
     const [isKeyImportModalOpen, setIsKeyImportModalOpen] = useState(false);
@@ -153,10 +155,15 @@ const InputSection: React.FC<InputSectionProps> = ({ inputs, setInputs, onAnalyz
         <div className="space-y-8">
 
             <div className="container-card bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-                <SubHeader title="Manajemen Sesi" subtitle="Simpan seluruh data (identitas, soal, jawaban) untuk dimuat kembali nanti." />
+                <SubHeader title="Manajemen Sesi" subtitle="Simpan & muat seluruh data analisis (identitas, soal, jawaban)." />
                 <div className="flex flex-wrap gap-3">
-                    <button onClick={onSaveAnalysis} className={successButton}>Simpan Analisis Saat Ini</button>
-                    <button onClick={onOpenLoadModal} className={primaryButton}>Muat Analisis Tersimpan</button>
+                    <button onClick={onSaveAnalysis} className={successButton}>Simpan di Browser</button>
+                    <button onClick={onOpenLoadModal} className={primaryButton}>Muat dari Browser</button>
+                    <button onClick={onExportAnalysis} className={secondaryButton}>Ekspor ke File</button>
+                    <label className={`${secondaryButton} cursor-pointer inline-flex items-center`}>
+                        Impor dari File
+                        <input type="file" accept=".json,application/json" onChange={onImportAnalysis} className="hidden" />
+                    </label>
                 </div>
             </div>
 
