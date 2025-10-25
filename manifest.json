@@ -1,0 +1,21 @@
+{
+  "short_name": "Analisis Nilai",
+  "name": "Analisis Nilai MTs Mutulingga",
+  "description": "Aplikasi Analisis Penilaian Hasil Belajar MTs Muhammadiyah 01 Purbalingga",
+  "icons": [
+    {
+      "src": "https://cdn.jsdelivr.net/gh/mts-mutulingga/analisis-nilai@main/mutulingga-icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "https://cdn.jsdelivr.net/gh/mts-mutulingga/analisis-nilai@main/mutulingga-icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#1e40af",
+  "background_color": "#f7f9fb"
+}
