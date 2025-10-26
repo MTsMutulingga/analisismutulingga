@@ -17,9 +17,9 @@ const OutputSection: React.FC<OutputSectionProps> = ({ result, inputs }) => {
             
             <ExportButtons result={result} inputs={inputs} />
 
-            <div className="container-card bg-white p-6 rounded-xl border border-gray-200 mb-8 shadow-sm">
+            <div className="container-card bg-white p-4 sm:p-6 rounded-xl border border-gray-200 mb-8 shadow-sm">
                 <h3 className="text-xl font-bold text-gray-800 mb-4 border-b pb-2">Visualisasi Distribusi Skor Siswa</h3>
-                <div id="score-distribution-chart" className="h-64">
+                <div id="score-distribution-chart" className="h-64 sm:h-72">
                     <ScoreDistributionChart students={result.students} kktp={inputs.kktp} />
                 </div>
                 <div className="flex justify-center items-center flex-wrap gap-x-4 gap-y-1 text-xs text-gray-600 mt-4">
@@ -29,7 +29,7 @@ const OutputSection: React.FC<OutputSectionProps> = ({ result, inputs }) => {
                 </div>
             </div>
 
-            <div className="container-card bg-white p-6 rounded-xl border border-gray-200 mb-8 shadow-sm">
+            <div className="container-card bg-white p-4 sm:p-6 rounded-xl border border-gray-200 mb-8 shadow-sm">
                 <h3 className="text-xl font-bold text-gray-800 mb-4 border-b pb-2">Ringkasan Skor Siswa dan Rencana Tindak Lanjut (RTL)</h3>
                 <SummaryTable students={result.students} totalQuestions={result.totalQuestions} />
                 <p className="text-xs text-gray-500 mt-4">
@@ -37,7 +37,7 @@ const OutputSection: React.FC<OutputSectionProps> = ({ result, inputs }) => {
                 </p>
             </div>
 
-            <div className="container-card bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+            <div className="container-card bg-white p-4 sm:p-6 rounded-xl border border-gray-200 shadow-sm">
                 <h3 className="text-xl font-bold text-gray-800 mb-4 border-b pb-2">Analisis Butir Soal</h3>
                 <ItemAnalysisTable itemAnalysis={result.itemAnalysis} />
                  <p className="text-xs text-gray-500 mt-4">

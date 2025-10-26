@@ -149,14 +149,14 @@ const InputSection: React.FC<InputSectionProps> = ({ inputs, setInputs, onAnalyz
     const infoButton = `${baseButtonClass} bg-teal-600 text-white hover:bg-teal-700 focus:ring-teal-400`;
 
     const labelClass = "block text-sm font-medium text-gray-700";
-    const inputClass = "mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm";
+    const inputClass = "mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm";
     
     const assessmentOptions = ['Penilaian Harian', 'Sumatif Tengah Semester', 'Sumatif Akhir Semester', 'Sumatif Akhir Tahun', 'Ujian Madrasah'];
 
     return (
         <div className="space-y-8">
 
-            <div className="container-card bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+            <div className="container-card bg-white p-4 sm:p-6 rounded-xl border border-gray-200 shadow-sm">
                 <SubHeader title="Manajemen Sesi & Bantuan" subtitle="Simpan, muat, ekspor, impor, dan lihat petunjuk kerja." />
                 <div className="flex flex-wrap gap-3">
                     <button onClick={onSaveAnalysis} className={successButton}>Simpan di Browser</button>
@@ -170,7 +170,7 @@ const InputSection: React.FC<InputSectionProps> = ({ inputs, setInputs, onAnalyz
                 </div>
             </div>
 
-            <div className="container-card bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+            <div className="container-card bg-white p-4 sm:p-6 rounded-xl border border-gray-200 shadow-sm">
                 <SubHeader title="1. Identitas Laporan" subtitle="Informasi umum mengenai penilaian yang akan dianalisis." />
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
                     <div>
@@ -224,30 +224,30 @@ const InputSection: React.FC<InputSectionProps> = ({ inputs, setInputs, onAnalyz
                 </div>
             </div>
 
-            <div className="container-card bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+            <div className="container-card bg-white p-4 sm:p-6 rounded-xl border border-gray-200 shadow-sm">
                 <SubHeader title="2. Butir Soal dan Kunci Jawaban" subtitle="Masukkan kunci jawaban, skor, dan jenis untuk setiap butir soal." />
-                <div className="overflow-x-auto">
-                    <table className="min-w-full">
+                <div className="overflow-x-auto border border-gray-200 rounded-lg">
+                    <table className="min-w-full divide-y divide-gray-200">
                         <thead className="bg-gray-50">
                             <tr>
-                                <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-16">No.</th>
-                                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kunci Jawaban</th>
-                                <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-24">Skor</th>
-                                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-48">Jenis Soal</th>
-                                <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-16">Aksi</th>
+                                <th scope="col" className="px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-12">No.</th>
+                                <th scope="col" className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24">Kunci Jawaban</th>
+                                <th scope="col" className="px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-28">Skor</th>
+                                <th scope="col" className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[160px]">Jenis Soal</th>
+                                <th scope="col" className="px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-16">Aksi</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody className="bg-white divide-y divide-gray-200">
                             {inputs.questions.map((q, i) => (
-                                <tr key={i} className="border-b">
-                                    <td className="px-4 py-2 text-center font-medium">{i + 1}</td>
-                                    <td className="px-4 py-2">
-                                        <input type="text" value={q.key} onChange={(e) => handleQuestionChange(i, 'key', e.target.value)} className={inputClass} placeholder="cth: A / B,C / BENAR"/>
+                                <tr key={i}>
+                                    <td className="px-2 py-2 text-center font-medium text-sm text-gray-500">{i + 1}</td>
+                                    <td className="px-2 py-2">
+                                        <input type="text" value={q.key} onChange={(e) => handleQuestionChange(i, 'key', e.target.value)} className={inputClass} placeholder="cth: A / B,C"/>
                                     </td>
-                                    <td className="px-4 py-2">
-                                        <input type="number" value={q.score} onChange={(e) => handleQuestionChange(i, 'score', e.target.value)} className={`${inputClass} text-center`} min="0"/>
+                                    <td className="px-2 py-2">
+                                        <input type="number" value={q.score} onChange={(e) => handleQuestionChange(i, 'score', e.target.value)} className={`${inputClass} text-center px-2`} min="0"/>
                                     </td>
-                                    <td className="px-4 py-2">
+                                    <td className="px-2 py-2">
                                         <select value={q.type} onChange={(e) => handleQuestionChange(i, 'type', e.target.value)} className={inputClass}>
                                             <option>Pilihan Ganda</option>
                                             <option>Pilihan Ganda Kompleks</option>
@@ -256,7 +256,7 @@ const InputSection: React.FC<InputSectionProps> = ({ inputs, setInputs, onAnalyz
                                             <option>Isian Singkat</option>
                                         </select>
                                     </td>
-                                    <td className="px-4 py-2 text-center">
+                                    <td className="px-2 py-2 text-center">
                                         <button onClick={() => removeQuestion(i)} className="text-red-500 hover:text-red-700" title="Hapus Soal">
                                             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" /></svg>
                                         </button>
@@ -272,7 +272,7 @@ const InputSection: React.FC<InputSectionProps> = ({ inputs, setInputs, onAnalyz
                 </div>
             </div>
 
-            <div className="container-card bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+            <div className="container-card bg-white p-4 sm:p-6 rounded-xl border border-gray-200 shadow-sm">
                 <SubHeader title="3. Jawaban Siswa" subtitle="Tempel data dari spreadsheet (Excel/Sheets) atau masukkan secara manual di bawah." />
                 <textarea
                     className="w-full h-24 p-3 font-mono text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
